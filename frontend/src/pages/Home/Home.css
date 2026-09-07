@@ -1,0 +1,61 @@
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 4.5rem;
+  padding-bottom: 2rem;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.75rem;
+}
+
+/* Call To Action Banner */
+.cta-banner {
+  background-color: var(--color-deep-green);
+  color: var(--color-offwhite);
+  border-radius: var(--radius-lg);
+  padding: 3.5rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border: 3px solid var(--color-lime);
+  box-shadow: var(--color-shadow-lg);
+}
+
+.cta-banner-content {
+  position: relative;
+  z-index: 2;
+  max-width: 650px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.cta-title {
+  color: var(--color-offwhite);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+}
+
+.cta-desc {
+  color: #c9ded0;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 640px) {
+  .home-page {
+    gap: 3rem;
+  }
+  .cta-banner {
+    padding: 2.5rem 1.5rem;
+  }
+}

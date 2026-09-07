@@ -1,0 +1,76 @@
+.my-activities-page {
+  padding: 3rem 0;
+}
+
+.activities-header-box {
+  background-color: var(--color-deep-green);
+  color: var(--color-offwhite);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  margin-bottom: 2rem;
+  border-bottom: 4px solid var(--color-lime);
+}
+
+.activities-header-title {
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  color: var(--color-offwhite);
+  margin-bottom: 0.5rem;
+}
+
+.activities-header-subtitle {
+  color: #c9ded0;
+  font-size: 1.05rem;
+}
+
+.activities-tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 0.5rem;
+}
+
+.activity-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background-color: transparent;
+  transition: all var(--transition-fast);
+}
+
+.activity-tab-btn:hover {
+  color: var(--color-text-main);
+  background-color: var(--color-surface-tint);
+}
+
+.activity-tab-btn.active {
+  background-color: var(--color-lime);
+  color: var(--color-text-main);
+  box-shadow: 0 4px 12px rgba(211, 205, 52, 0.3);
+}
+
+.tab-badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  background-color: var(--color-deep-green);
+  color: var(--color-offwhite);
+}
+
+.activity-tab-btn.active .tab-badge-count {
+  background-color: var(--color-text-main);
+  color: var(--color-lime);
+}

@@ -1,0 +1,39 @@
+.category-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 1.25rem 0 2rem 0;
+}
+
+.filter-pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+}
+
+.filter-pill-btn:hover {
+  border-color: var(--color-olive);
+  color: var(--color-text-main);
+  background-color: var(--color-surface-tint);
+}
+
+.filter-pill-btn.active {
+  background-color: var(--color-deep-green);
+  color: var(--color-offwhite);
+  border-color: var(--color-deep-green);
+  box-shadow: 0 4px 12px rgba(6, 100, 75, 0.2);
+}
+
+.filter-pill-btn.active .pill-icon {
+  transform: scale(1.15);
+}
