@@ -1,4 +1,4 @@
-# 🎓 CampusConnect
+# 🎓 CampusConnect 1.0
 
 > **Discover. Connect. Belong.**
 
