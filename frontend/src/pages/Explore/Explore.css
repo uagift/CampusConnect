@@ -46,3 +46,4 @@
   border-radius: var(--radius-pill);
   font-weight: 700;
 }
+.api-message { margin:0 0 1.5rem; padding:.8rem 1rem; border-radius:var(--radius-sm); background:var(--color-soft-blue-light); color:var(--color-text-main); font-weight:600; }.api-error { background:#fff2ed; color:#7d3126; }.api-message button { margin-left:.5rem; color:inherit; font-weight:800; text-decoration:underline; }.compact-button { padding:.35rem .85rem; font-size:.82rem; }

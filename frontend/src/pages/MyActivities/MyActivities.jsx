@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { useCampus } from '../../context/CampusContext';
 import EventCard from '../../components/EventCard/EventCard';
 import EmptyState from '../../components/EmptyState/EmptyState';

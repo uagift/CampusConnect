@@ -182,3 +182,4 @@
     padding: 1.5rem;
   }
 }
+.details-status { padding:4rem 0; font-weight:700; }.details-image-placeholder { height:280px; display:grid; place-items:center; background:var(--color-deep-green); color:var(--color-lime); font:700 2rem var(--font-heading); }.owner-actions { display:flex; flex-wrap:wrap; gap:.75rem; margin-top:.5rem; }.delete-btn { background:#8d3029; color:white; }.edit-title { margin-bottom:1.5rem; }.edit-cancel { margin-top:1rem; }.event-external-link { text-align:center; font-weight:700; color:var(--color-olive); }

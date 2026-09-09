@@ -1,114 +1,30 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { EVENTS_DATA } from '../data/events';
 
-/**
- * REACT LEARNING CONCEPT: React Context API
- * 
- * 1. WHAT IT DOES:
- *    Context provides a way to pass data through the component tree without 
- *    having to pass props manually down at every level ("prop drilling").
- * 
- * 2. WHY WE NEED IT HERE:
- *    The state of "Saved Events" and "Joined Events" needs to be accessed and modified 
- *    from multiple pages and components:
- *    - Navbar (shows badge counters for saved/joined)
- *    - EventCard (shows dynamic bookmark icon state)
- *    - EventDetails (shows "Save" and "Join" buttons)
- *    - MyActivities (renders saved & joined event lists)
- *    Without Context, we would have to pass state & handler functions up and down 4+ levels!
- * 
- * 3. HOW THE DATA FLOWS:
- *    Events data -> CampusProvider state -> Context.Provider -> Custom Hook useCampus() -> Any child component.
- * 
- * 4. WHAT YOU CAN EDIT/CHANGE LATER:
- *    - You can persist saved/joined events to localStorage so they stay saved when refreshing.
- *    - You can add notifications or toast alerts when an item is saved/joined.
- */
-
-// 1. Create the Context object
 const CampusContext = createContext(null);
+const read = (key, fallback) => { try { const stored = localStorage.getItem(key); return stored ? JSON.parse(stored) : fallback; } catch { return fallback; } };
+const campusEvents = EVENTS_DATA.map((event) => ({ ...event, source: 'campus', isCommunityCreated: false }));
 
-// 2. Create the Provider Component
 export const CampusProvider = ({ children }) => {
-  // Initialize state with default saved/joined event IDs
-  const [savedEventIds, setSavedEventIds] = useState(() => {
-    const local = localStorage.getItem('campus_saved_events');
-    return local ? JSON.parse(local) : ["evt-101", "evt-103"];
-  });
-
-  const [joinedEventIds, setJoinedEventIds] = useState(() => {
-    const local = localStorage.getItem('campus_joined_events');
-    return local ? JSON.parse(local) : ["evt-102"];
-  });
-
-  // Sync state to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('campus_saved_events', JSON.stringify(savedEventIds));
-  }, [savedEventIds]);
-
-  useEffect(() => {
-    localStorage.setItem('campus_joined_events', JSON.stringify(joinedEventIds));
-  }, [joinedEventIds]);
-
-  // Toggle Save status for an event
-  const toggleSaveEvent = (id) => {
-    setSavedEventIds((prevSaved) => {
-      if (prevSaved.includes(id)) {
-        return prevSaved.filter((savedId) => savedId !== id);
-      } else {
-        return [...prevSaved, id];
-      }
-    });
-  };
-
-  // Toggle Join status for an event
-  const toggleJoinEvent = (id) => {
-    setJoinedEventIds((prevJoined) => {
-      if (prevJoined.includes(id)) {
-        return prevJoined.filter((joinedId) => joinedId !== id);
-      } else {
-        return [...prevJoined, id];
-      }
-    });
-  };
-
-  // Helper utility methods
-  const isSaved = (id) => savedEventIds.includes(id);
-  const isJoined = (id) => joinedEventIds.includes(id);
-
-  // Derived full event data lists
-  const savedEvents = EVENTS_DATA.filter((event) => savedEventIds.includes(event.id));
-  const joinedEvents = EVENTS_DATA.filter((event) => joinedEventIds.includes(event.id));
-
-  // The value object containing all state and functions we want to share
-  const value = {
-    events: EVENTS_DATA,
-    savedEventIds,
-    joinedEventIds,
-    savedEvents,
-    joinedEvents,
-    toggleSaveEvent,
-    toggleJoinEvent,
-    isSaved,
-    isJoined,
-    savedCount: savedEventIds.length,
-    joinedCount: joinedEventIds.length
-  };
-
-  return (
-    <CampusContext.Provider value={value}>
-      {children}
-    </CampusContext.Provider>
-  );
+  const [savedEventIds, setSavedEventIds] = useState(() => read('campus_saved_events', ['evt-101', 'evt-103']));
+  const [joinedEventIds, setJoinedEventIds] = useState(() => read('campus_joined_events', ['evt-102']));
+  const [communityEvents, setCommunityEvents] = useState(() => read('campus_community_events', []));
+  const [eventCache, setEventCache] = useState(() => read('campus_event_cache', []));
+  useEffect(() => localStorage.setItem('campus_saved_events', JSON.stringify(savedEventIds)), [savedEventIds]);
+  useEffect(() => localStorage.setItem('campus_joined_events', JSON.stringify(joinedEventIds)), [joinedEventIds]);
+  useEffect(() => localStorage.setItem('campus_community_events', JSON.stringify(communityEvents)), [communityEvents]);
+  useEffect(() => localStorage.setItem('campus_event_cache', JSON.stringify(eventCache)), [eventCache]);
+  const events = useMemo(() => [...campusEvents, ...communityEvents, ...eventCache], [communityEvents, eventCache]);
+  const rememberEvent = (event) => { if (!event || event.source !== 'ticketmaster') return; setEventCache((current) => current.some((item) => item.id === event.id) ? current.map((item) => item.id === event.id ? event : item) : [...current, event]); };
+  const toggleIds = (setter, id, event) => { rememberEvent(event); setter((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]); };
+  const createCommunityEvent = (values) => { const event = { ...values, id: `community-${crypto.randomUUID()}`, source: 'community', isCommunityCreated: true, ownerId: 'campus-demo-user', shortDescription: values.description, image: values.image || '', tags: [], venue: '', externalLink: '', spotsLeft: null, isPopular: false }; setCommunityEvents((current) => [...current, event]); return event; };
+  const updateCommunityEvent = (id, values) => setCommunityEvents((current) => current.map((event) => event.id === id ? { ...event, ...values, shortDescription: values.description } : event));
+  const deleteCommunityEvent = (id) => { setCommunityEvents((current) => current.filter((event) => event.id !== id)); setSavedEventIds((current) => current.filter((item) => item !== id)); setJoinedEventIds((current) => current.filter((item) => item !== id)); };
+  const savedEvents = events.filter((event) => savedEventIds.includes(event.id));
+  const joinedEvents = events.filter((event) => joinedEventIds.includes(event.id));
+  const value = { events, communityEvents, savedEvents, joinedEvents, savedEventIds, joinedEventIds, savedCount: savedEventIds.length, joinedCount: joinedEventIds.length, isSaved: (id) => savedEventIds.includes(id), isJoined: (id) => joinedEventIds.includes(id), toggleSaveEvent: (id, event) => toggleIds(setSavedEventIds, id, event), toggleJoinEvent: (id, event) => toggleIds(setJoinedEventIds, id, event), rememberEvent, createCommunityEvent, updateCommunityEvent, deleteCommunityEvent, findEvent: (id) => events.find((event) => event.id === id) };
+  return <CampusContext.Provider value={value}>{children}</CampusContext.Provider>;
 };
-
-// 3. Create a custom hook for easy consumption of Context
-export const useCampus = () => {
-  const context = useContext(CampusContext);
-  if (!context) {
-    throw new Error('useCampus must be used within a CampusProvider');
-  }
-  return context;
-};
-
+export const useCampus = () => { const context = useContext(CampusContext); if (!context) throw new Error('useCampus must be used within a CampusProvider'); return context; };
 export default CampusContext;

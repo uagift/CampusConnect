@@ -1,179 +1,21 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useCampus } from '../../context/CampusContext';
-import { EVENTS_DATA } from '../../data/events';
+import { getTicketmasterEvent } from '../../services/ticketmasterApi';
 import EmptyState from '../../components/EmptyState/EmptyState';
+import EventForm from '../../components/EventForm/EventForm';
 import './EventDetails.css';
-
-/**
- * REACT LEARNING CONCEPT: Dynamic Routes & useParams()
- * 
- * 1. WHAT IT DOES:
- *    `useParams()` reads dynamic parameters from the current URL defined in the router:
- *    `<Route path="/events/:id" element={<EventDetails />} />`
- *    If the browser URL is `/events/evt-101`, `useParams()` returns `{ id: 'evt-101' }`.
- * 
- * 2. WHY WE NEED IT HERE:
- *    Allows one single EventDetails component file to dynamically render any event 
- *    in the system without duplicating pages or code!
- * 
- * 3. HOW THE DATA FLOWS:
- *    URL (/events/:id) -> useParams() gets id -> EVENTS_DATA.find(e => e.id === id) -> renders matching event details.
- * 
- * 4. WHAT YOU CAN EDIT/CHANGE LATER:
- *    - Add a comment section or RSVP count meter.
- *    - Add "Share Event" modal.
- */
-
 const EventDetails = () => {
-  const { id } = useParams();
-  const { isSaved, isJoined, toggleSaveEvent, toggleJoinEvent } = useCampus();
-  const [toastMessage, setToastMessage] = useState(null);
-
-  // Look up the event matching the URL parameter
-  const event = EVENTS_DATA.find((e) => e.id === id);
-
-  // Trigger temporary feedback toast
-  const triggerToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3000);
-  };
-
-  if (!event) {
-    return (
-      <div className="container" style={{ padding: '4rem 0' }}>
-        <EmptyState 
-          icon="❓"
-          title="Event Not Found"
-          message="The campus opportunity you are looking for does not exist or has ended."
-          actionLabel="Back to Explore"
-          onAction={() => window.location.href = '/explore'}
-        />
-      </div>
-    );
-  }
-
-  const saved = isSaved(event.id);
-  const joined = isJoined(event.id);
-
-  const handleToggleSave = () => {
-    toggleSaveEvent(event.id);
-    triggerToast(saved ? "Removed from Saved Activities" : "Saved to My Activities!");
-  };
-
-  const handleToggleJoin = () => {
-    toggleJoinEvent(event.id);
-    triggerToast(joined ? "Left event registration" : "Successfully joined event! See you there.");
-  };
-
-  return (
-    <div className="event-details-page container animate-fade-in">
-      {/* Back Navigation Link */}
-      <Link to="/explore" className="back-link-btn">
-        ← Back to All Opportunities
-      </Link>
-
-      <div className="details-card">
-        {/* Banner Cover Image */}
-        <div className="details-banner-frame">
-          <img src={event.image} alt={event.title} className="details-banner-img" />
-        </div>
-
-        <div className="details-content-grid">
-          {/* Main Left Details */}
-          <div className="details-main-info">
-            <div className="details-header-tags">
-              <span className="badge badge-deep-green">{event.category}</span>
-              {event.isPopular && <span className="badge badge-lime">🔥 Popular Event</span>}
-            </div>
-
-            <h1 className="details-title">{event.title}</h1>
-            <p className="details-organizer">Organized by: {event.organizer}</p>
-
-            <div className="details-divider"></div>
-
-            <h3 className="details-section-heading">About This Opportunity</h3>
-            <p className="details-description">{event.description}</p>
-
-            <div className="details-divider"></div>
-
-            <h3 className="details-section-heading">Topics & Skill Tags</h3>
-            <div className="details-tags-row">
-              {event.tags.map((tag, idx) => (
-                <span key={idx} className="badge badge-soft-blue">#{tag}</span>
-              ))}
-            </div>
-          </div>
-
-          {/* Right Meta Sidebar */}
-          <div className="details-meta-sidebar">
-            {toastMessage && (
-              <div className="toast-feedback">
-                <span>✦</span>
-                <span>{toastMessage}</span>
-              </div>
-            )}
-
-            <div className="meta-info-item">
-              <div className="meta-icon-box">📅</div>
-              <div className="meta-text-group">
-                <span className="meta-label">Date</span>
-                <span className="meta-value">{event.date}</span>
-              </div>
-            </div>
-
-            <div className="meta-info-item">
-              <div className="meta-icon-box">⏰</div>
-              <div className="meta-text-group">
-                <span className="meta-label">Time</span>
-                <span className="meta-value">{event.time}</span>
-              </div>
-            </div>
-
-            <div className="meta-info-item">
-              <div className="meta-icon-box">📍</div>
-              <div className="meta-text-group">
-                <span className="meta-label">Location</span>
-                <span className="meta-value">{event.location}</span>
-              </div>
-            </div>
-
-            <div className="meta-info-item">
-              <div className="meta-icon-box">🎟️</div>
-              <div className="meta-text-group">
-                <span className="meta-label">Availability</span>
-                <span className="meta-value" style={{ color: 'var(--color-deep-green)' }}>
-                  {event.spotsLeft} spots remaining
-                </span>
-              </div>
-            </div>
-
-            <div className="details-action-buttons">
-              {/* Join Action Button */}
-              <button 
-                className={`btn ${joined ? 'btn-joined' : 'btn-primary'}`}
-                onClick={handleToggleJoin}
-                style={{ width: '100%' }}
-              >
-                {joined ? '✓ Joined Activity' : 'Join Event Now'}
-              </button>
-
-              {/* Save Action Button */}
-              <button 
-                className={`btn ${saved ? 'btn-saved' : 'btn-outline'}`}
-                onClick={handleToggleSave}
-                style={{ width: '100%' }}
-              >
-                {saved ? '★ Saved in Activities' : '☆ Save for Later'}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  const { id } = useParams(); const navigate = useNavigate();
+  const { findEvent, rememberEvent, isSaved, isJoined, toggleSaveEvent, toggleJoinEvent, updateCommunityEvent, deleteCommunityEvent } = useCampus();
+  const [fetchedEvent, setFetchedEvent] = useState(null); const cachedEvent = findEvent(id); const event = cachedEvent || fetchedEvent; const [loading, setLoading] = useState(false); const [error, setError] = useState(''); const [toast, setToast] = useState(''); const [editing, setEditing] = useState(false);
+  useEffect(() => { if (cachedEvent || !id.startsWith('tm-')) return undefined; const controller = new AbortController(); const load = async () => { setLoading(true); setError(''); try { const result = await getTicketmasterEvent(id.slice(3), controller.signal); rememberEvent(result); setFetchedEvent(result); } catch (err) { if (err.name !== 'AbortError') setError(err.message); } finally { if (!controller.signal.aborted) setLoading(false); } }; load(); return () => controller.abort(); }, [id, cachedEvent, rememberEvent]);
+  const notify = (message) => { setToast(message); window.setTimeout(() => setToast(''), 3000); };
+  if (loading) return <div className="container details-status">⏳ Loading event details…</div>;
+  if (!event) return <div className="container" style={{padding:'4rem 0'}}><EmptyState icon="❓" title="Event Not Found" message={error || 'The opportunity you are looking for does not exist or could not be loaded.'} actionLabel="Back to Explore" onAction={() => navigate('/explore')} /></div>;
+  const saved = isSaved(event.id); const joined = isJoined(event.id); const isCommunity = event.source === 'community' && event.ownerId === 'campus-demo-user';
+  const edit = (values) => { updateCommunityEvent(event.id, values); setFetchedEvent((current) => ({ ...(current || event), ...values, shortDescription: values.description })); setEditing(false); notify('Community opportunity updated.'); };
+  const remove = () => { if (window.confirm('Delete this community opportunity? This cannot be undone.')) { deleteCommunityEvent(event.id); navigate('/explore'); } };
+  return <div className="event-details-page container animate-fade-in"><Link to="/explore" className="back-link-btn">← Back to All Opportunities</Link>{editing ? <><h1 className="details-title edit-title">Edit community opportunity</h1><EventForm initialEvent={event} onSubmit={edit} submitLabel="Save Changes" /><button className="btn btn-outline edit-cancel" onClick={() => setEditing(false)}>Cancel</button></> : <div className="details-card"><div className="details-banner-frame">{event.image ? <img src={event.image} alt={event.title} className="details-banner-img" /> : <div className="details-image-placeholder">CampusConnect</div>}</div><div className="details-content-grid"><div className="details-main-info"><div className="details-header-tags"><span className="badge badge-deep-green">{event.category}</span>{event.source === 'ticketmaster' && <span className="badge badge-soft-blue">Ticketmaster</span>}</div><h1 className="details-title">{event.title}</h1>{event.organizer && <p className="details-organizer">Organized by: {event.organizer}</p>}<div className="details-divider"/><h3 className="details-section-heading">About This Opportunity</h3><p className="details-description">{event.description || 'Details are provided by the event organizer.'}</p>{(event.tags || []).length > 0 && <><div className="details-divider"/><h3 className="details-section-heading">Topics & Skill Tags</h3><div className="details-tags-row">{event.tags.map((tag) => <span key={tag} className="badge badge-soft-blue">#{tag}</span>)}</div></>}{isCommunity && <div className="owner-actions"><button className="btn btn-outline" onClick={() => setEditing(true)}>Edit opportunity</button><button className="btn delete-btn" onClick={remove}>Delete opportunity</button></div>}</div><aside className="details-meta-sidebar">{toast && <div className="toast-feedback">✦ {toast}</div>}{event.date && <div className="meta-info-item"><div className="meta-icon-box">📅</div><div className="meta-text-group"><span className="meta-label">Date</span><span className="meta-value">{event.date}</span></div></div>}{event.time && <div className="meta-info-item"><div className="meta-icon-box">⏰</div><div className="meta-text-group"><span className="meta-label">Time</span><span className="meta-value">{event.time}</span></div></div>}{(event.venue || event.location) && <div className="meta-info-item"><div className="meta-icon-box">📍</div><div className="meta-text-group"><span className="meta-label">Location</span><span className="meta-value">{[event.venue,event.location].filter(Boolean).join(', ')}</span></div></div>}{event.spotsLeft !== null && event.spotsLeft !== undefined && <div className="meta-info-item"><div className="meta-icon-box">🎟️</div><div className="meta-text-group"><span className="meta-label">Availability</span><span className="meta-value">{event.spotsLeft} spots remaining</span></div></div>}<div className="details-action-buttons"><button className={`btn ${joined ? 'btn-joined' : 'btn-primary'}`} onClick={() => { toggleJoinEvent(event.id, event); notify(joined ? 'Left event registration.' : 'Successfully joined event!'); }}>{joined ? '✓ Joined Activity' : 'Join Event Now'}</button><button className={`btn ${saved ? 'btn-saved' : 'btn-outline'}`} onClick={() => { toggleSaveEvent(event.id, event); notify(saved ? 'Removed from Saved Activities.' : 'Saved to My Activities!'); }}>{saved ? '★ Saved in Activities' : '☆ Save for Later'}</button>{event.registrationLink && <a className="btn btn-secondary" href={event.registrationLink} target="_blank" rel="noreferrer">Registration / Tickets ↗</a>}{event.externalLink && event.externalLink !== event.registrationLink && <a className="event-external-link" href={event.externalLink} target="_blank" rel="noreferrer">View on Ticketmaster ↗</a>}</div></aside></div></div>}</div>;
 };
-
 export default EventDetails;
