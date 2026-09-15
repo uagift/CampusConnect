@@ -61,9 +61,13 @@ const Hero = () => {
         <div className="hero-visual-card">
           <div className="hero-visual-img-frame">
             <img 
-              src="/images/club_fair.jpg" 
+              src="/images/club_fair.jpg"
+              srcSet="/images/club_fair-480.jpg 480w, /images/club_fair.jpg 800w"
+              sizes="(max-width: 900px) calc(100vw - 3rem), 600px"
               alt="Campus Life & Student Clubs" 
               className="hero-visual-img" 
+              fetchPriority="high"
+              decoding="async"
             />
           </div>
           <div className="hero-floating-pill">

@@ -83,6 +83,10 @@
   color: #8da494;
 }
 
+.footer-bottom p {
+  color: #b0c9b7;
+}
+
 @media (max-width: 900px) {
   .footer-grid {
     grid-template-columns: 1fr 1fr;

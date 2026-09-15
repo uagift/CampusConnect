@@ -1,12 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
-
 :root {
   /* CampusConnect Brand Palette */
   --color-deep-green: #06644B;
   --color-deep-green-dark: #044836;
   --color-lime: #D3CD34;
   --color-lime-hover: #c4be2c;
-  --color-olive: #748036;
+  --color-olive: #65702f;
   --color-soft-blue: #6994BE;
   --color-soft-blue-light: #eef4f9;
   --color-offwhite: #FFFEFF;
